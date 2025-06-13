@@ -14,8 +14,8 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         // Create roles
-        $supervisorRole = Role::firstOrCreate(['name' => 'supervisor']);
-        Role::firstOrCreate(['name' => 'admin']);
+        $supervisorRole = Role::firstOrCreate(['name' => 'supervisor', 'guard_name' => 'admin']);
+        Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'admin']);
         Role::firstOrCreate(['name' => 'user']);
 
         // Create permissions
@@ -28,7 +28,7 @@ class RoleSeeder extends Seeder
         ];
 
         foreach ($permissions as $permissionName) {
-            $permission = Permission::firstOrCreate(['name' => $permissionName]);
+            $permission = Permission::firstOrCreate(['name' => $permissionName, 'guard_name' => 'admin']);
             $supervisorRole->givePermissionTo($permission);
         }
     }

@@ -14,5 +14,7 @@ require __DIR__ . '/auth.php';
 Route::fallback(function() {
     return response()->json([
         'error' => true,
+        'message' => 'Not Found.'
     ], 404);
 });
+
