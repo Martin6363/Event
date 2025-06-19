@@ -7,13 +7,16 @@ use App\Http\Requests\Event\EventStoreRequest;
 use App\Http\Resources\EventResource;
 use App\Models\Event;
 use App\Services\Admin\EventService;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Throwable;
 
 class EventController extends Controller
 {
+    use AuthorizesRequests;
     public const PER_PAGE = 10;
-    public function __construct(readonly EventService $eventService) {}
+
+    public function __construct(readonly EventService $eventService){}
 
     public function index(): JsonResponse
     {
@@ -32,23 +35,15 @@ class EventController extends Controller
 
     public function store(EventStoreRequest $request)
     {
-        try {
-            $event = $this->eventService->create([
-                ...$request->validated(),
-                'user_id' => $request->user()->id,
-            ]);
+        $event = $this->eventService->create([
+            ...$request->validated(),
+            'user_id' => $request->user()->id,
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'event' => new EventResource($event),
-            ]);
-        } catch (Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create event.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'event' => new EventResource($event),
+        ]);
     }
 
     public function show(Event $event)
@@ -73,6 +68,7 @@ class EventController extends Controller
 
     public function approve(Event $event)
     {
+        $this->authorize('approve', $event);
         $event = $this->eventService->approve($event);
 
         return response()->json([

@@ -41,11 +41,11 @@ return [
             'provider' => 'users',
         ],
         'api' => [
-            'driver' => 'custom-token',
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
         'admin' => [
-            'driver' => 'custom-token',
+            'driver' => 'sanctum',
             'provider' => 'admins',
         ],
     ],
