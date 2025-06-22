@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\api;
 
+use App\DTO\EventData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Event\EventStoreRequest;
 use App\Http\Resources\EventResource;
@@ -9,7 +10,7 @@ use App\Models\Event;
 use App\Services\Admin\EventService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
-use Throwable;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class EventController extends Controller
 {
@@ -21,6 +22,29 @@ class EventController extends Controller
     {
     }
 
+    /**
+     * @return JsonResponse
+     * @OA\Get(
+     *     path="/api/v1/events",
+     *     tags={"User - Events"},
+     *     summary="List Events",
+     *     description="Returns a paginated list of events",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="success: true",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event")),
+     *             @OA\Property(property="pagination", type="object",
+     *                 @OA\Property(property="total", type="integer", example=50),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function index(): JsonResponse
     {
         $events = Event::latest()->orderByDesc('created_at')->paginate(self::PER_PAGE);
@@ -36,25 +60,25 @@ class EventController extends Controller
         ]);
     }
 
-    public function store(EventStoreRequest $request)
+    /**
+     * @param EventStoreRequest $eventStoreRequest
+     * @return JsonResponse
+     * @throws UnknownProperties
+     */
+    public function store(EventStoreRequest $eventStoreRequest): JsonResponse
     {
-        try {
-            $event = $this->eventService->create([
-                ...$request->validated(),
-                'user_id' => $request->user()->id,
-            ]);
+        $eventData = new EventData([
+            ...$eventStoreRequest->validated(),
+            'user_id' => $eventStoreRequest->user()->id,
+            'banner' => $eventStoreRequest->file('banner'),
+            'status' => 'moderation',
+        ]);
+        $event = $this->eventService->create($eventData);
 
-            return response()->json([
-                'success' => true,
-                'event' => new EventResource($event),
-            ]);
-        } catch (Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to create event.',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'success' => true,
+            'event' => new EventResource($event),
+        ]);
     }
 
     public function show(Event $event)
@@ -68,7 +92,15 @@ class EventController extends Controller
     public function update(EventStoreRequest $request, Event $event)
     {
         $this->authorize('update', $event);
-        $updated = $this->eventService->update($event, [...$request->validated()]);
+
+        $eventData = new EventData([
+            ...$request->validated(),
+            'user_id' => $event->user_id,
+            'banner' => $request->file('banner'),
+            'status' => 'moderation',
+        ]);
+
+        $updated = $this->eventService->update($event, $eventData);
 
         return response()->json([
             'success' => true,

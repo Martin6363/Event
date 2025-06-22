@@ -1,0 +1,342 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Event API Documentation",
+        "description": "This is the Swagger UI for the Admin Event Management API.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://event.loc/",
+            "description": "Main API Server"
+        }
+    ],
+    "paths": {
+        "/api/v1/admin/login": {
+            "post": {
+                "tags": [
+                    "Auth Admin"
+                ],
+                "summary": "Admin Login",
+                "description": "Login with email and password to get a Bearer token",
+                "operationId": "0482e3c072902432c728d30e267fe095",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "Bearer eyJ0eXAiOiJK..."
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
+        "/api/v1/admin/logout": {
+            "post": {
+                "tags": [
+                    "Auth Admin"
+                ],
+                "summary": "Admin Logout",
+                "description": "Logs out the authenticated admin",
+                "operationId": "80cf84f274ebba151ab33a37be9e4396",
+                "responses": {
+                    "200": {
+                        "description": "Logout successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout successful."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Not logged in or already logged out",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "You are not logged in or already logged out."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/events": {
+            "get": {
+                "tags": [
+                    "Admin - Events"
+                ],
+                "summary": "List Events",
+                "description": "Returns a paginated list of events",
+                "operationId": "31ee89fa16c1a06cb0b002c20eeeab41",
+                "responses": {
+                    "200": {
+                        "description": "success: true",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Event"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/events": {
+            "get": {
+                "tags": [
+                    "User - Events"
+                ],
+                "summary": "List Events",
+                "description": "Returns a paginated list of events",
+                "operationId": "e615fed18ade9673c02a69f956a6ff7f",
+                "responses": {
+                    "200": {
+                        "description": "success: true",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Event"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "properties": {
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Event": {
+                "title": "Event",
+                "required": [
+                    "id",
+                    "user_id",
+                    "status",
+                    "title",
+                    "date"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "user_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "published"
+                    },
+                    "title": {
+                        "type": "string",
+                        "example": "Community Gathering"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "A great community event."
+                    },
+                    "location": {
+                        "type": "string",
+                        "example": "Central Park"
+                    },
+                    "date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-06-30"
+                    },
+                    "time": {
+                        "type": "string",
+                        "example": "18:00"
+                    },
+                    "duration": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "duration_unit": {
+                        "type": "string",
+                        "example": "hours"
+                    },
+                    "gender": {
+                        "type": "string",
+                        "example": "any"
+                    },
+                    "members_count": {
+                        "type": "integer",
+                        "example": 50
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-06-19T12:34:56Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-06-19T12:34:56Z"
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Add token as: Bearer {your_token}",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth Admin",
+            "description": "Auth Admin"
+        },
+        {
+            "name": "Admin - Events",
+            "description": "Admin - Events"
+        },
+        {
+            "name": "User - Events",
+            "description": "User - Events"
+        }
+    ]
+}

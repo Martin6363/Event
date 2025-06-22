@@ -2,18 +2,17 @@
 
 namespace App\Services\Admin;
 
+use App\DTO\EventData;
 use App\Models\Event;
 use Illuminate\Support\Facades\DB;
 
 class EventService
 {
-    public function create(array $data): Event|null
+    public function create(EventData $data): Event
     {
         return DB::transaction(function () use ($data) {
-            $banner = $data['banner'] ?? null;
-            unset($data['banner']);
-
-            $event = Event::create($data);
+            $banner = $data->banner;
+            $event = Event::create($data->except('banner')->toArray());
 
             if ($banner) {
                 $event->addMedia($banner)->toMediaCollection('banner');
@@ -23,13 +22,11 @@ class EventService
         });
     }
 
-    public function update(Event $event, array $data): Event|null
+    public function update(Event $event, EventData $data): Event
     {
         return DB::transaction(function () use ($event, $data) {
-            $banner = $data['banner'] ?? null;
-            unset($data['banner']);
-
-            $event->update($data);
+            $banner = $data->banner;
+            $event->update($data->except('banner')->toArray());
 
             if ($banner) {
                 $event->clearMediaCollection('banner');

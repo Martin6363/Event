@@ -12,6 +12,7 @@ use Spatie\Permission\Middleware\RoleMiddleware;
 use Spatie\Permission\Middleware\RoleOrPermissionMiddleware;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use function App\Helpers\parseDtoError;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -66,6 +67,16 @@ return Application::configure(basePath: dirname(__DIR__))
                 'message' => 'Validation failed.',
                 'errors' => $e->errors(),
             ]);
+        });
+
+        $exceptions->renderable(function (TypeError $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid data provided.',
+                    'errors' => parseDtoError($e),
+                ], 422);
+            }
         });
 
         $exceptions->renderable(function (Throwable $e, Request $request) {

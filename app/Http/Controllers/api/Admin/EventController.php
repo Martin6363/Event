@@ -18,6 +18,28 @@ class EventController extends Controller
 
     public function __construct(readonly EventService $eventService){}
 
+    /**
+     * @OA\Get(
+     *     path="/api/v1/admin/events",
+     *     tags={"Admin - Events"},
+     *     summary="List Events",
+     *     description="Returns a paginated list of events",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="success: true",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Event")),
+     *             @OA\Property(property="pagination", type="object",
+     *                 @OA\Property(property="total", type="integer", example=50),
+     *                 @OA\Property(property="current_page", type="integer", example=1),
+     *                 @OA\Property(property="per_page", type="integer", example=10),
+     *                 @OA\Property(property="last_page", type="integer", example=5),
+     *             )
+     *         )
+     *     )
+     * )
+     */
     public function index(): JsonResponse
     {
         $events = Event::latest()->orderByDesc('created_at')->paginate(self::PER_PAGE);
